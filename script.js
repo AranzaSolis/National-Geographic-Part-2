@@ -150,11 +150,15 @@ async function askFieldGuide() {
     /* --------------------------------------------------------
        STEP 5: Send the POST request, parse, and display.
        -------------------------------------------------------- */
-    const response = await fetch(WORKER_URL, {
+        const response = await fetch(OPENAI_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: messages }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({ model: "gpt-4o", messages: messages }),
     });
+     
 
     if (!response.ok) {
       throw new Error(`Request failed with status ${response.status}`);
