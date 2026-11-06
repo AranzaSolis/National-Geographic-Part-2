@@ -34,9 +34,10 @@ const questionInput = document.getElementById("questionInput");
 const askBtn = document.getElementById("askBtn");
 const guideResponseEl = document.getElementById("guideResponse");
 
-// Your class worker URL. The worker holds the OpenAI key,
-// so the key NEVER appears in this file.
-const WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/";
+// OpenAI's Chat Completions endpoint.
+// Your key lives in secrets.js as OPENAI_API_KEY.
+// secrets.js is in .gitignore, so it never gets pushed to GitHub.
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 askBtn.addEventListener("click", askFieldGuide);
 
