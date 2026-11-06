@@ -29,9 +29,10 @@ const languagesEl = document.getElementById("languagesValue");
 const fieldGuideEl = document.getElementById("fieldGuide");
 const guideCountryNameEl = document.getElementById("guideCountryName");
 
-// Your class worker URL. The worker holds the OpenAI key,
-// so the key NEVER goes in this file.
-const WORKER_URL = "PASTE-YOUR-WORKER-URL-HERE";
+// OpenAI's Chat Completions endpoint.
+// Your key lives in secrets.js as OPENAI_API_KEY.
+// secrets.js is in .gitignore, so it never gets pushed to GitHub.
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 /* ============================================================
    STEP 1: Select the Field Guide elements and connect
