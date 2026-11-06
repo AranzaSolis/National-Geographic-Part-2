@@ -1,17 +1,22 @@
 /* ============================================================
    COUNTRY EXPLORER, PART 2: ASK THE FIELD GUIDE — script.js
-   MAIN BRANCH (Steps 1-6 complete — the guided demo)
+   INSTRUCTOR DEMO (main branch)
    ------------------------------------------------------------
-   PART 1 PATTERN (GET):
+   Live-code Steps 1-6 here with the class. This file matches
+   the student starter, so your screen matches theirs.
+   Completed code: SOLUTION branch.
+   ------------------------------------------------------------
+   Last week (Part 1) you used a GET request:
      Request -> Receive -> Parse -> Display
 
-   PART 2 PATTERN (POST):
+   Today you'll use a POST request to talk to an AI:
      User Question + Country Data -> POST to AI -> Generated Answer -> Display
 
-   Steps 7-10 are stretch goals. See the bottom of this file.
+   The Part 1 Country Explorer is already finished below.
+   Your job: Steps 1-6. If you finish, try Steps 7-10.
    ============================================================ */
 
-// --- Element references (Part 1) ------------------------------
+// --- Element references (Part 1 — already done) --------------
 const searchBtn = document.getElementById("searchBtn");
 const countryInput = document.getElementById("countryInput");
 const loadingEl = document.getElementById("loading");
@@ -24,29 +29,38 @@ const regionEl = document.getElementById("regionValue");
 const populationEl = document.getElementById("populationValue");
 const languagesEl = document.getElementById("languagesValue");
 
-/* ============================================================
-   PART 2 — STEP 1: Select the Field Guide elements
-   and connect the Ask button.
-   ============================================================ */
+// Part 2 elements that are already selected for you
 const fieldGuideEl = document.getElementById("fieldGuide");
 const guideCountryNameEl = document.getElementById("guideCountryName");
-const questionInput = document.getElementById("questionInput");
-const askBtn = document.getElementById("askBtn");
-const guideResponseEl = document.getElementById("guideResponse");
 
 // OpenAI's Chat Completions endpoint.
 // Your key lives in secrets.js as OPENAI_API_KEY.
 // secrets.js is in .gitignore, so it never gets pushed to GitHub.
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-askBtn.addEventListener("click", askFieldGuide);
+/* ============================================================
+   STEP 1: Select the Field Guide elements and connect
+   the Ask button.
+   ------------------------------------------------------------
+   Look in index.html for these ids:
+     questionInput, askBtn, guideResponse
+   Then add a click event listener to the Ask button that
+   calls askFieldGuide.
+   ============================================================ */
+// TODO: const questionInput = ...
+// TODO: const askBtn = ...
+// TODO: const guideResponseEl = ...
+// TODO: askBtn.addEventListener(...)
+
 
 /* ============================================================
-   PART 2 — STEP 2: Remember the country the user explored.
+   STEP 2 (part 1): Create a variable to remember the country.
+   Start it as null (nothing explored yet).
    ============================================================ */
-let currentCountry = null;
+// TODO: let currentCountry = ...
 
-// --- Part 1: connect the Explore button ------------------------
+
+// --- Part 1: connect the Explore button (already done) --------
 searchBtn.addEventListener("click", fetchCountry);
 
 async function fetchCountry() {
@@ -93,19 +107,18 @@ async function fetchCountry() {
     errorEl.classList.add("hidden");
 
     /* ----------------------------------------------------------
-       PART 2 — STEP 2 (continued): save the country and
-       reveal the Field Guide.
+       STEP 2 (part 2): Save the country and show the Field Guide.
+       1. Store `country` in currentCountry
+       2. Put the country's name in guideCountryNameEl
+       3. Remove the "hidden" class from fieldGuideEl
        ---------------------------------------------------------- */
-    currentCountry = country;
-    guideCountryNameEl.textContent = country.names.common;
-    guideResponseEl.textContent = `Ask me anything about ${country.names.common}.`;
-    guideResponseEl.className = "guide-response";
-    fieldGuideEl.classList.remove("hidden");
+    // TODO
+
+
   } catch (error) {
     hideLoading();
     resultCard.classList.add("hidden");
     fieldGuideEl.classList.add("hidden");
-    currentCountry = null;
     errorEl.textContent = `We couldn't find "${countryName}". Check the spelling and try again.`;
     errorEl.classList.remove("hidden");
     console.error(error);
@@ -113,77 +126,67 @@ async function fetchCountry() {
 }
 
 /* ============================================================
-   PART 2 — STEP 3: Create askFieldGuide()
+   STEP 3: Create askFieldGuide()
+   ------------------------------------------------------------
+   Inside it:
+   - Read the question from questionInput (use .trim())
+   - If there is no currentCountry, show
+     "Explore a country first" in guideResponseEl and return
+   - If the question is empty, show "Type a question first"
+     and return
    ============================================================ */
 async function askFieldGuide() {
-  const question = questionInput.value.trim();
+  // TODO: read and validate the question
 
-  if (!currentCountry) {
-    guideResponseEl.textContent = "Explore a country first, then ask your question.";
-    return;
-  }
-
-  if (!question) {
-    guideResponseEl.textContent = "Type a question first.";
-    return;
-  }
 
   /* ----------------------------------------------------------
      STEP 4: Build the messages array.
+     ----------------------------------------------------------
+     AI chat APIs expect an array of { role, content } objects:
+       - role "system" -> the rules. Use buildSystemPrompt(currentCountry)
+       - role "user"   -> the visitor's question
      ---------------------------------------------------------- */
-  const messages = [
-    { role: "system", content: buildSystemPrompt(currentCountry) },
-    { role: "user", content: question },
-  ];
+  // TODO: const messages = [ ... ];
+
 
   /* ----------------------------------------------------------
-     STEP 6 (part 1): loading state
+     STEP 5: Send the POST request, parse, and display.
+     ----------------------------------------------------------
+     const response = await fetch(OPENAI_URL, {
+       method: ...,                                  // "POST"
+       headers: {
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${OPENAI_API_KEY}`
+       },
+       body: JSON.stringify({ model: "gpt-4o", messages: messages })
+     });
+
+     - If !response.ok, throw a new Error
+     - Convert the response with await response.json()
+     - console.log it and look at the shape!
+     - The AI's text lives at: data.choices[0].message.content
+     - Put that text into guideResponseEl.textContent
      ---------------------------------------------------------- */
-  guideResponseEl.textContent = "Consulting the field notes...";
-  guideResponseEl.className = "guide-response thinking";
-  askBtn.disabled = true;
+  // TODO
+
 
   /* ----------------------------------------------------------
-     STEP 6 (part 2): try/catch
+     STEP 6: Make it reliable.
+     ----------------------------------------------------------
+     1. Go back ABOVE your Step 5 code and add a loading state:
+          - show "Consulting the field notes..." in guideResponseEl
+          - set askBtn.disabled = true
+     2. Wrap your Step 5 code in try { } catch (error) { } finally { }
+          - catch:   console.error(error) and show a friendly
+                     error message in guideResponseEl
+          - finally: set askBtn.disabled = false
      ---------------------------------------------------------- */
-  try {
-    /* --------------------------------------------------------
-       STEP 5: Send the POST request, parse, and display.
-       -------------------------------------------------------- */
-        const response = await fetch(OPENAI_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({ model: "gpt-4o", messages: messages }),
-    });
-     
 
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("Raw AI response:", data); // inspect the shape!
-
-    const reply = data.choices[0].message.content;
-    guideResponseEl.textContent = reply;
-    guideResponseEl.className = "guide-response";
-  } catch (error) {
-    console.error(error);
-    guideResponseEl.textContent =
-      "The Field Guide couldn't answer right now. Please try again in a moment.";
-    guideResponseEl.className = "guide-response guide-error";
-  } finally {
-    askBtn.disabled = false;
-  }
 }
 
 /* ============================================================
-   STEP 4 (helper): the system prompt.
-   Grounding = the country facts from Part 1.
-   Guardrails = the client's requirements.
+   STEP 4 (helper — already built): the system prompt.
+   Read it! This is where the AI gets its rules and facts.
    ============================================================ */
 function buildSystemPrompt(country) {
   const facts = [
@@ -203,7 +206,7 @@ Only answer questions about ${country.names.common}. Keep answers short, warm an
 }
 
 /* ============================================================
-   STRETCH GOALS (Steps 7-10) — try these on your own!
+   STRETCH GOALS (Steps 7-10)
    ------------------------------------------------------------
    STEP 7: Tighten the guardrails in buildSystemPrompt().
      Add rules for: staying on topic (and steering back politely),
@@ -227,7 +230,7 @@ Only answer questions about ${country.names.common}. Keep answers short, warm an
      textContent, and appends it to #chatLog.
    ============================================================ */
 
-// --- Part 1 helpers --------------------------------------------
+// --- Part 1 helpers (already done) -----------------------------
 function showLoading() {
   loadingEl.classList.remove("hidden");
   errorEl.classList.add("hidden");
