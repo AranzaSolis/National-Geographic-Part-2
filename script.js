@@ -51,6 +51,15 @@ const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 // TODO: const askBtn = ...
 // TODO: const guideResponseEl = ...
 // TODO: askBtn.addEventListener(...)
+const questionInput = document.getElementById("questionInput"); //taking info from here
+const askBtn = document.getElementById("askBtn"); //trigger button make severything happen (RESPONSE)
+const guideResponseEl = document.getElementById("guideResponse"); //(DISPLAY)
+
+askBtn.addEventListener('click', askFieldGuide) //ask button for field guide, add event listener for click (passing a reference)
+
+
+
+
 
 
 /* ============================================================
@@ -58,7 +67,8 @@ const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
    Start it as null (nothing explored yet).
    ============================================================ */
 // TODO: let currentCountry = ...
-
+//SCOPING (declaring this two times but this one with let) previous variable declared inside funciton, so only place this exists in is inside the function
+let currentCountry = null;//sstore in place where fetchCountry can actually see it
 
 // --- Part 1: connect the Explore button (already done) --------
 searchBtn.addEventListener("click", fetchCountry);
@@ -106,6 +116,20 @@ async function fetchCountry() {
     resultCard.classList.remove("hidden");
     errorEl.classList.add("hidden");
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /* ----------------------------------------------------------
        STEP 2 (part 2): Save the country and show the Field Guide.
        1. Store `country` in currentCountry
@@ -113,6 +137,37 @@ async function fetchCountry() {
        3. Remove the "hidden" class from fieldGuideEl
        ---------------------------------------------------------- */
     // TODO
+    //reassign value of current country
+    currentCountry = country; //store the country object in currentCountry variable
+    console.log(currentCountry.names.common); //log to console to see the country object
+    //current coutnry
+    //.names.common is the name of the country
+    //copy property path from the country object to display the name of the country in the field guide (console)
+    // |
+    // |
+    // V
+
+    guideCountryNameEl.textContent = country.names.common; //display the name of the country in the field guide
+    fieldGuideEl.classList.remove("hidden"); //remove hidden class to show the field guide
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   } catch (error) {
@@ -137,6 +192,33 @@ async function fetchCountry() {
    ============================================================ */
 async function askFieldGuide() {
   // TODO: read and validate the question
+  //we need the question that the user entered in the box, so create variable for it
+  const question = questionInput.value.trim(); //trim to remove whitespace
+  
+  if (!currentCountry) { //if no country is selected
+    guideResponseEl.textContent = "Explore a country first"; //show message to user
+    return; //exit function
+  }
+
+  if (!question) { //if the question is empty
+    guideResponseEl.textContent = "Type a question first"; //show message to user
+    return; //exit function
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /* ----------------------------------------------------------
@@ -147,6 +229,26 @@ async function askFieldGuide() {
        - role "user"   -> the visitor's question
      ---------------------------------------------------------- */
   // TODO: const messages = [ ... ];
+const messages = [ { role: "system", content: buildSystemPrompt(currentCountry) }, { role: "user", content: question }, ];
+//system is the rules, user is the question, so we need to build an array of objects with role and content properties
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /* ----------------------------------------------------------
@@ -183,6 +285,49 @@ async function askFieldGuide() {
      ---------------------------------------------------------- */
 
 }
+
+guideResponseEl.textContent = "Consulting the field notes...";
+  guideResponseEl.className = "guide-response thinking";
+  askBtn.disabled = true;
+
+try{
+  //use fetch to call the API
+  const response = await fetch(OPENAI_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_API_KEY}`
+    }, //we are tyrign to send it smt ->body is the data we are sending to the API, so we need to stringify it
+    body: JSON.stringify({ model: "gpt-4o", messages: messages }) //send the model and messages to the API
+  });
+  
+  const data = await response.json(); //PARSE RESPONSE
+  //console.log(data.choices[0].message); //log the data to see the shape of the response
+  let messageContent = data.choices[0].message.content; //get the AI's reply //DISPLAY IT
+  guideResponseEl.innerText = messageContent;
+
+
+  if (!response.ok) {
+    throw new Error("Failed to get a response from the AI");
+  }
+
+  const data = await response.json();
+  console.log(data); //log the data to see the shape of the response
+
+  const aiReply = data.choices[0].message.content; //get the AI's reply
+  guideResponseEl.textContent = aiReply; //display the AI's reply in the guideResponseEl
+  guideResponseEl.className = "guide-response"; //remove the thinking class
+
+
+
+
+}catch(err){
+  console.error(err);
+}finally{
+  console.log('Alll finished!');
+}
+
+
 
 /* ============================================================
    STEP 4 (helper — already built): the system prompt.
